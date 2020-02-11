@@ -1,0 +1,58 @@
+Service Plan for Reviews
+Service Owner: Gal Weinstock
+What are your service's inputs and outputs (API Spec)?
+Define all the API endpoints that will be used to consume and publish data. What is the shape of the data (i.e. list all the properties and types) for each API endpoint and/or message?
+
+‘/reviews’
+This endpoint will retrieve an array of object while each object is a review.
+Each review object will have this properties: 
+{
+    _id: auto generated string,
+    accomodationId: Integer,
+    scores : {
+        Accuracy: Float,
+        Communication: Float,
+        Cleanliness: Float,
+        Check_in: Float,
+        Value: Float,
+        Location: Float,
+        Outstanding_hospitality: Boolean,
+        Quick_responses: Boolean,
+        Stylish_space: Boolean,
+        Sparkling_clean: Boolean,
+        Amazing_amenities: Boolean,
+        },
+        Review_author_details: {
+            Name: String,
+            User_picture: String,
+            User_page_link: String,
+            Date: Date,
+            Review_text: String
+        }
+}
+Data Schema
+How will your data be stored? What DBMS do you plan to use and why? If you are using a SQL database, what is the schema for this data (create an ER diagram)? It is useful to think about the organization of your data in a DMBS even if you are using a noSQL datastore. In that case describe the shape of the data for all collections you plan to use.
+
+My schema looks like this:
+ accommodationId: { type: Number, required: true },
+ scores: {
+   accuracy: { type: mongoose.Types.Decimal128 },
+   communication: { type: mongoose.Types.Decimal128 },
+   cleanliness: { type: mongoose.Types.Decimal128 },
+   checkIn: { type: mongoose.Types.Decimal128 },
+   value: { type: mongoose.Types.Decimal128 },
+   location: { type: mongoose.Types.Decimal128 },
+   outstandingHospitality: Boolean,
+   quickResponses: Boolean,
+   stylishSpace: Boolean,
+   sparklingClean: Boolean,
+   amazingAmenities: Boolean
+ },
+ reviewAuthorDetails: {
+   name: String,
+   userPicture: String,
+   userPageLink: String,
+   date: Date,
+   reviewText: String
+ }
+}

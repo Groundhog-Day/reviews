@@ -25,24 +25,138 @@ rest of CRUD.
 
 ### Schema
 
-[wip]
+#### Mongo
+The data is organized into two schemas.
+One for data describing the accommodation, and
+one for data describing individual reviews. 
+Schema: accommodationSchema, reviewSchema
+
+accommodation: {
+  id: number,
+  accuracy: float,
+  communication: float,
+  cleanliness: float,
+  checkIn: float,
+  value: float,
+  location: float,
+},
+review: {
+  accommodationId: number
+  userName: string,
+  userPicture: string,
+  userPageLink: string,
+  date: date,
+  reviewText: string
+}
+
+
+#### MySQL
+
+The schema describes two tables.
+GET will require nesting reviews query into accommodation query.
+
+table: accommodations
+  id: number (primary key)
+  accuracy: float
+  communication: float
+  cleanliness: float
+  checkIn: float
+  value: float
+  location: float 
+
+table: reviews
+  id: number (primary key)
+  accommodationId: number (foreign key)
+  userName: string
+  userPicture: string
+  userPageLink: string
+  date: date
+  reviewText: string
 
 
 ### Create -- POST
 
-[wip]
+Posts a new review object to the db.
+Requires nesting inside a GET query to calculate new averages.
+This POST assigns a unique id to the created review.
+
+app.post('/v1/api/:accommodationId/reviews', ...
+
+{
+  userName: string,
+  userPicture: string,
+  userPageLink: string,
+  date: date,
+  reviewText: string
+}
 
 
 ### Read -- GET
 
-[wip]
+Route returns JSON containing two objects: an accommodations
+object with accommodation metadata, along with a reviews object
+containing any number of review objects.
+This object ideally omits reviewId.
+
+app.get('/v1/api/:accommodationId/reviews', ...
+
+{
+  accommodation: {
+    id: number,
+    accuracy: float,
+    communication: float,
+    cleanliness: float,
+    checkIn: float,
+    value: float,
+    location: float,
+  },
+  reviews: {
+    {
+      userName: string,
+      userPicture: string,
+      userPageLink: string,
+      date: date,
+      reviewText: string
+    },
+    {
+      userName: string,
+      userPicture: string,
+      userPageLink: string,
+      date: date,
+      reviewText: string
+    },
+
+    ...
+  }
+}
 
 
 ### Update -- PUT
 
-[wip]
+Updates an existing review object in the db.
+Requires nesting inside a GET query to calculate new averages.
+Any number of these fields could be included in the request.
+
+app.put('/v1/api/:accommodationId/reviews/:reviewId', ...
+
+{
+  id: number,
+  accommodationId: number,
+  userName: string,
+  userPicture: string,
+  userPageLink: string,
+  date: date,
+  reviewText: string
+}
 
 
 ### Destroy - DELETE
 
-[wip]
+Deletes an existing review in the db with
+review's primary key id as parameter.
+
+app.delete('/v1/api/:accommodationId/reviews/:reviewId', ...
+
+{
+  reviewId: number
+}

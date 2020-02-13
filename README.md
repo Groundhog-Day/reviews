@@ -26,28 +26,40 @@ rest of CRUD.
 ### Schema
 
 #### Mongo
-The data is organized into two schemas.
-One for data describing the accommodation, and
-one for data describing individual reviews. 
-Schema: accommodationSchema, reviewSchema
+The schema is organized as an array of review objects
+nested inside an accommodation object.
+The accommodation statistics (floats) are included
+at the top level as well as the review level because
+I don't want to average my all records on every get query.
+This method allows me to recalculate the top-level statistic
+every post and update, and also recalculate the top-level
+when a single review is deleted.
 
+```json
 accommodation: {
-  id: number,
-  accuracy: float,
-  communication: float,
-  cleanliness: float,
-  checkIn: float,
-  value: float,
-  location: float,
-},
-review: {
-  accommodationId: number
-  userName: string,
-  userPicture: string,
-  userPageLink: string,
-  date: date,
-  reviewText: string
+  "id": "number",
+  "accuracy": "float",
+  "communication": "float",
+  "cleanliness": "float",
+  "checkIn": "float",
+  "value": "float",
+  "location": "float",
+  "reviews": [{
+    "id": "number",
+    "userName": "string",
+    "userPicture": "string",
+    "userPageLink": "string",
+    "date": "date",
+    "reviewText": "string",
+    "accuracy": "float",
+    "communication": "float",
+    "cleanliness": "float",
+    "checkIn": "float",
+    "value": "float",
+    "location": "float",
+  }]
 }
+```
 
 
 #### MySQL
@@ -55,24 +67,18 @@ review: {
 The schema describes two tables.
 GET will require nesting reviews query into accommodation query.
 
-table: accommodations
-  id: number (primary key)
-  accuracy: float
-  communication: float
-  cleanliness: float
-  checkIn: float
-  value: float
-  location: float 
+Table: accommodations
+
+| id                   | accuracy | communication | cleanliness | checkIn | value | location |
+|----------------------|----------|---------------|-------------|---------|-------|----------|
+| number (primary key) | float    | float         | float       | float   | float | float    |
+
 
 table: reviews
-  id: number (primary key)
-  accommodationId: number (foreign key)
-  userName: string
-  userPicture: string
-  userPageLink: string
-  date: date
-  reviewText: string
 
+| id                   | accommodationId      | userName | userPicture | userPageLink | date | reviewText | accuracy | communication | cleanliness | checkIn | value | location |
+|----------------------|----------------------|----------|-------------|--------------|------|------------|----------|---------------|-------------|---------|-------|----------|
+| number (primary key) | number (foreign key) | string   | string      | string       | date | string     | float    | float         | float       | float   | float | float    |
 
 ### Create -- POST
 
@@ -82,72 +88,75 @@ This POST assigns a unique id to the created review.
 
 app.post('/v1/api/:accommodationId/reviews', ...
 
+The request object:
+```json 
 {
-  userName: string,
-  userPicture: string,
-  userPageLink: string,
-  date: date,
-  reviewText: string
+  "accommodationId": "number",
+  "userName": "string",
+  "userPicture": "string",
+  "userPageLink": "string",
+  "date": "date",
+  "reviewText": "string",
+  "accuracy": "float",
+  "communication": "float",
+  "cleanliness": "float",
+  "checkIn": "float",
+  "value": "float",
+  "location": "float",
 }
+```
 
 
 ### Read -- GET
 
-Route returns JSON containing two objects: an accommodations
-object with accommodation metadata, along with a reviews object
-containing any number of review objects.
-This object ideally omits reviewId.
+Route returns JSON containing accommodation metadata and an array containing any number of review objects.
+This response omits statistic metadata in the review object.
 
 app.get('/v1/api/:accommodationId/reviews', ...
 
+The response object:
+```json
 {
-  accommodation: {
-    id: number,
-    accuracy: float,
-    communication: float,
-    cleanliness: float,
-    checkIn: float,
-    value: float,
-    location: float,
-  },
-  reviews: {
-    {
-      userName: string,
-      userPicture: string,
-      userPageLink: string,
-      date: date,
-      reviewText: string
-    },
-    {
-      userName: string,
-      userPicture: string,
-      userPageLink: string,
-      date: date,
-      reviewText: string
-    },
-
-    ...
-  }
+  "id": "number",
+  "accuracy": "float",
+  "communication": "float",
+  "cleanliness": "float",
+  "checkIn": "float",
+  "value": "float",
+  "location": "float",
+  "reviews": [{
+    "userName": "string",
+    "userPicture": "string",
+    "userPageLink": "string",
+    "date": "date",
+    "reviewText": "string"
+  }]
 }
+```
 
 
-### Update -- PUT
+### Update -- PATCH
 
 Updates an existing review object in the db.
 Requires nesting inside a GET query to calculate new averages.
 Any number of these fields could be included in the request.
 
-app.put('/v1/api/:accommodationId/reviews/:reviewId', ...
+app.patch('/v1/api/:accommodationId/reviews/:reviewId', ...
 
+The request object:
+```json
 {
-  id: number,
-  accommodationId: number,
-  userName: string,
-  userPicture: string,
-  userPageLink: string,
-  date: date,
-  reviewText: string
+  "id": "number",
+  "accommodationId": "number",
+  "accuracy": "float",
+  "communication": "float",
+  "cleanliness": "float",
+  "checkIn": "float",
+  "value": "float",
+  "location": "float",
+  "reviewText": "string"
 }
+```
 
 
 ### Destroy - DELETE
@@ -157,6 +166,9 @@ review's primary key id as parameter.
 
 app.delete('/v1/api/:accommodationId/reviews/:reviewId', ...
 
+The request object:
+```json
 {
-  reviewId: number
+  "reviewId": "number"
 }
+```

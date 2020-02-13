@@ -10,27 +10,27 @@ db.once('open', function () {
 
 var reviewSchema = new mongoose.Schema(
   {
-    accommodationId: { type: Number, required: true },
-    scores: {
+    id: { type: Number, required: true },
+    accuracy: { type: mongoose.Types.Decimal128 },
+    communication: { type: mongoose.Types.Decimal128 },
+    cleanliness: { type: mongoose.Types.Decimal128 },
+    checkIn: { type: mongoose.Types.Decimal128 },
+    value: { type: mongoose.Types.Decimal128 },
+    location: { type: mongoose.Types.Decimal128 },
+    reviews: [{
+      id: { type: Number, required: true },
+      userName: String,
+      userPicture: String,
+      userPageLink: String,
+      date: Date,
+      reviewText: String,
       accuracy: { type: mongoose.Types.Decimal128 },
       communication: { type: mongoose.Types.Decimal128 },
       cleanliness: { type: mongoose.Types.Decimal128 },
       checkIn: { type: mongoose.Types.Decimal128 },
       value: { type: mongoose.Types.Decimal128 },
-      location: { type: mongoose.Types.Decimal128 },
-      outstandingHospitality: Boolean,
-      quickResponses: Boolean,
-      stylishSpace: Boolean,
-      sparklingClean: Boolean,
-      amazingAmenities: Boolean
-    },
-    reviewAuthorDetails: {
-      name: String,
-      userPicture: String,
-      userPageLink: String,
-      date: Date,
-      reviewText: String
-    }
+      location: { type: mongoose.Types.Decimal128 }
+    }]
   }
 );
 
@@ -41,7 +41,7 @@ const getAllReviewsForSpecificHouse = function (callback, houseId) {
     if (err) {
       console.log(err);
     } else {
-      console.log(reviews);
+      //console.log(reviews);
       callback(reviews);
     }
   });

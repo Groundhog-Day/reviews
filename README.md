@@ -74,7 +74,7 @@ Table: accommodations
 | number (primary key) | float    | float         | float       | float   | float | float    |
 
 
-table: reviews
+Table: reviews
 
 | id                   | accommodationId      | userName | userPicture | userPageLink | date | reviewText | accuracy | communication | cleanliness | checkIn | value | location |
 |----------------------|----------------------|----------|-------------|--------------|------|------------|----------|---------------|-------------|---------|-------|----------|

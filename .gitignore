@@ -3,3 +3,5 @@ package-lock.json
 *.jpg
 .DS_Store
 bundle.js
+accommodations.json
+reviews.json

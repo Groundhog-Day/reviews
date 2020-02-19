@@ -1,8 +1,7 @@
 node_modules
 package-lock.json
 *.jpg
+*.csv
 .DS_Store
 bundle.js
-accommodations.json
-reviews.json
 config.js

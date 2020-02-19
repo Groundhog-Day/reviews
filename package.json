@@ -25,6 +25,7 @@
     "express": "^4.17.1",
     "identity-obj-proxy": "^3.0.0",
     "mongoose": "^5.8.9",
+    "mysql": "^2.18.1",
     "nodemon": "^2.0.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",

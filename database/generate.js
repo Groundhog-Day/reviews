@@ -3,18 +3,18 @@ const faker = require('faker');
 //const dbReviewModel = require('./index.js');
 
 const NUM_RECORDS = 10000000; //10 million
-const MIN_REVIEWS = 15;
-const MAX_REVIEWS = 40; //maximum reviews per accommodation
+const MIN_REVIEWS = 4;
+const MAX_REVIEWS = 7; //maximum reviews per accommodation
 
 let turnLoggingOn = true;
-let checkpoints = 20;
+let checkpoints = 100;
 let checkpoint = 0;
 
 let reviewIndex = 0;
 
 //clean files
-fs.writeFileSync('accommodations.json', '[');
-fs.writeFileSync('reviews.json', '[');
+fs.writeFileSync('accommodations.csv', `"id","accuracy","communication","cleanliness","checkIn","value","location"\n`);
+fs.writeFileSync('reviews.csv', `"id","accommodationId","userName","userPicture","userPageLink","date","reviewText","accuracy","communication","cleanliness","checkIn","value","location"\n`);
 
 let beginGenerateRecords = function (i) { 
 
@@ -33,20 +33,13 @@ let beginGenerateRecords = function (i) {
 };
 
 let endGenerateRecords = function (i, max, avg) {
-  let ajson = '{"id":"' + i + '",' +
-          '"accuracy":"' + Math.round((avg['accuracy'] / max) * 100) / 100 + '",' +
-          '"communication":"' + Math.round((avg['communication'] / max) * 100) / 100 + '",' +
-          '"cleanliness":"' + Math.round((avg['cleanliness'] / max) * 100) / 100 + '",' +
-          '"checkIn":"' + Math.round((avg['checkIn'] / max) * 100) / 100 + '",' +
-          '"value":"' + Math.round((avg['value'] / max) * 100) / 100 + '",' +
-          '"location":"' + Math.round((avg['location'] / max) * 100) / 100 + '"}';
-
-
-  if (i < NUM_RECORDS - 1) {
-    ajson += ',';
-  } else {
-    ajson += ']';
-  }
+  let acsv = i + ',' +
+          Math.round((avg['accuracy'] / max) * 100) / 100 + ',' +
+          Math.round((avg['communication'] / max) * 100) / 100 + ',' +
+          Math.round((avg['cleanliness'] / max) * 100) / 100 + ',' +
+          Math.round((avg['checkIn'] / max) * 100) / 100 + ',' +
+          Math.round((avg['value'] / max) * 100) / 100 + ',' +
+          Math.round((avg['location'] / max) * 100) / 100 + '\n';
 
   if (turnLoggingOn) {
     let progress = Math.floor(NUM_RECORDS / checkpoints);
@@ -56,7 +49,7 @@ let endGenerateRecords = function (i, max, avg) {
     }
   }
 
-  fs.appendFile('accommodations.json', ajson, 'utf8', function (err) {
+  fs.appendFile('accommodations.csv', acsv, 'utf8', function (err) {
     if (err) throw err;
 
     if (i + 1 < NUM_RECORDS) {
@@ -82,28 +75,23 @@ let generateReviews = function (i, j, max, avg) {
   avg['value'] += value;
   avg['location'] += location;
 
-  vjson = '{"id":"' + reviewIndex + '","accommodationId":"' + i + '",' +
-            '"userName":"' + faker.name.findName() + '",' + 
-            '"userPicture":"' + 'https://airbnb-reviews-users-pictures.s3-us-west-1.amazonaws.com/${Math.ceil(Math.random() * 3000)}.jpg' + '",' + 
-            '"userPageLink":"' + faker.internet.url() + '",' + 
-            '"date":"' + faker.date.recent() + '",' + 
-            '"reviewText":"' + faker.lorem.paragraph() + '",' + 
-            '"accuracy":"' + accuracy + '",' + 
-            '"communication":"' + communication + '",' + 
-            '"cleanliness":"' + cleanliness + '",' + 
-            '"checkIn":"' + checkIn + '",' + 
-            '"value":"' + value + '",' + 
-            '"location":"' + location + '"}';
-
-  if (i < NUM_RECORDS - 1 && j < max - 1) {
-    vjson += ',';
-  } else {
-    vjson += ']';
-  }
+  vcsv = reviewIndex + ',' + 
+            i + ',' +
+            faker.name.findName() + ',' + 
+            `"https://airbnb-reviews-users-pictures.s3-us-west-1.amazonaws.com/${Math.ceil(Math.random() * 3000)}.jpg"` + ',' + 
+            faker.internet.url() + ',' + 
+            faker.date.recent() + ',' + 
+            faker.lorem.paragraph() + ',' + 
+            accuracy + ',' + 
+            communication + ',' + 
+            cleanliness + ',' + 
+            checkIn + ',' + 
+            value + ',' + 
+            location + '\n';
 
   reviewIndex++;
 
-  fs.appendFile('reviews.json', vjson, 'utf8', function (err) {
+  fs.appendFile('reviews.csv', vcsv, 'utf8', function (err) {
     if (err) throw err;
 
     if (j + 1 < max) {

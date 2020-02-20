@@ -1,53 +1,27 @@
-const mongoose = require('mongoose');
+const mysql = require('mysql');
+const mysqlConfig = require('./config.js');
 
-mongoose.connect('mongodb://localhost/airbnbReviews', { useNewUrlParser: true, useUnifiedTopology: true });
+const connection = mysql.createConnection(mysqlConfig);goose.connect('mongodb://localhost/airbnbReviews', { useNewUrlParser: true, useUnifiedTopology: true });
 
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function () {
-  console.log("we're connected to airbnb DB!");
-})
-
-var reviewSchema = new mongoose.Schema(
-  {
-    id: { type: Number, required: true },
-    accuracy: { type: mongoose.Types.Decimal128 },
-    communication: { type: mongoose.Types.Decimal128 },
-    cleanliness: { type: mongoose.Types.Decimal128 },
-    checkIn: { type: mongoose.Types.Decimal128 },
-    value: { type: mongoose.Types.Decimal128 },
-    location: { type: mongoose.Types.Decimal128 },
-    reviews: [{
-      id: { type: Number, required: true },
-      userName: String,
-      userPicture: String,
-      userPageLink: String,
-      date: Date,
-      reviewText: String,
-      accuracy: { type: mongoose.Types.Decimal128 },
-      communication: { type: mongoose.Types.Decimal128 },
-      cleanliness: { type: mongoose.Types.Decimal128 },
-      checkIn: { type: mongoose.Types.Decimal128 },
-      value: { type: mongoose.Types.Decimal128 },
-      location: { type: mongoose.Types.Decimal128 }
-    }]
-  }
-);
-
-const Review = mongoose.model('Review', reviewSchema);
-
-const getAllReviewsForSpecificHouse = function (callback, houseId) {
-  Review.find({ "accommodationId": houseId }, function (err, reviews) {
+const getAccommodation = function (callback, houseId) {
+  connection.query('SELECT * from accommodations where id=' + houseId, function (error, accommodation, fields) {
     if (err) {
       console.log(err);
     } else {
-      //console.log(reviews);
-      callback(reviews);
+      results = accommodation[0];
+
+      connection.query('SELECT * from reviews where accommodationId=' + houseId, function (error, reviews, fields) {
+        if (err) {
+          console.log(err);
+        } else {
+          results.reviews = reviews;
+          callback(results);
+        }
+      });
     }
   });
 };
 
 module.exports = {
-  Review,
-  getAllReviewsForSpecificHouse
+  getAccommodation
 };

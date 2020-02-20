@@ -1,46 +1,57 @@
-const faker = require('faker');
-const dbReviewModel = require('./index.js');
+const fs = require('fs');
+const readline = require('readline');
+const dbAccommodationModel = require('./index.js');
 
-const FAKE_DATA_SIZE = 10000;
+const readAccommodations = readline.createInterface({
+    input: fs.createReadStream('./accommodations.csv'),
+    output: null,
+    console: false
+});
 
-for (let i = 0; i < FAKE_DATA_SIZE; i++) {
-  const review = {
-    accommodationId: Math.floor(((Math.random() * 100))),
-    scores: {
-      accuracy: Math.round(((Math.random() * 5) + Number.EPSILON + 0.1) * 10) / 10,
-      communication: Math.round(((Math.random() * 5) + Number.EPSILON + 0.1) * 10) / 10,
-      cleanliness: Math.round(((Math.random() * 5) + Number.EPSILON + 0.1) * 10) / 10,
-      checkIn: Math.round(((Math.random() * 5) + Number.EPSILON + 0.1) * 10) / 10,
-      value: Math.round(((Math.random() * 5) + Number.EPSILON + 0.1) * 10) / 10,
-      location: Math.round(((Math.random() * 5) + Number.EPSILON + 0.1) * 10) / 10,
-      outstandingHospitality: Math.random() > 0.5,
-      quickResponses: Math.random() > 0.5,
-      stylishSpace: Math.random() > 0.5,
-      sparklingClean: Math.random() > 0.5,
-      amazingAmenities: Math.random() > 0.5
-    },
-    reviewAuthorDetails: {
-      name: faker.name.findName(),
-      userPicture: `https://airbnb-reviews-users-pictures.s3-us-west-1.amazonaws.com/${Math.ceil(Math.random() * 3000)}.jpg`,
-      userPageLink: faker.internet.url(),
-      date: faker.date.recent(),
-      reviewText: faker.lorem.paragraphs()
-    }
-  };
-  // fakeReviewsArray.push(review);
-  // console.log(`${i}. `);
-  // console.log(review);
-  // console.log('-----------------------------------------------');
-  // console.log();
+const NUM_RECORDS = 10000000;
 
-  const reviewEntry = new dbReviewModel.Review(review);
+const turnLoggingOn = true;
+let checkpoints = 100;
+let checkpoint = 0;
+let accommodationsIndex = 0;
 
-  reviewEntry.save((err, review) => {
+const modelA = dbAccommodationModel.Accommodation;
+
+readAccommodations.on('line', function(line) {
+  const arr = line.split(',');
+
+  if (accommodationsIndex < 1) {
+    accommodationsIndex++;
+    process.stdout.write("#");
+    return;
+  }
+
+  const accommodationEntry = new modelA({
+    "id": accommodationsIndex,
+    "accuracy": arr[0],
+    "communication": arr[1],
+    "cleanliness": arr[2],
+    "checkIn": arr[3],
+    "value": arr[4],
+    "location": arr[5]
+  });
+
+  accommodationEntry.save((err, accommodation) => {
     if (err) {
       console.log(err);
-    } else {
-      console.log(`${i}.`)
-      console.log(`${reviewEntry._id} has been saved to the db.`);
     }
   });
-}
+
+  if (turnLoggingOn) {
+    let progress = Math.floor(NUM_RECORDS / checkpoints);
+    if (accommodationsIndex % progress === 0) {
+      process.stdout.write("#");
+      checkpoint++;
+    }
+  }
+  accommodationsIndex++;
+});
+
+readAccommodations.on('close', function(line) {
+    console.log('Seeding script complete!');
+});

@@ -20,13 +20,11 @@ class Reviews extends React.Component {
 
   render() {
     let myArray = this.props.reviews;
-    
-    console.log(this.props.reviews.length);
 
     return (
       <div className="Reviews">
         <ReviewsHeader stats={this.props.stats} />
-        {this.props.reviews.slice(0, 6).map(r => <ReviewEntry review={r} />)}
+        {this.props.reviews.slice(0, 6).map(r => <ReviewEntry key={r.id} review={r} />)}
       </div>
     );
   }

@@ -4,6 +4,8 @@ const app = express();
 const port = 2020;
 const path = require('path');
 
+require('newrelic');
+
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
 //create

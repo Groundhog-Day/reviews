@@ -4,6 +4,8 @@ const app = express();
 const port = 2020;
 const path = require('path');
 
+require('newrelic');
+
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
 //create
@@ -16,11 +18,13 @@ app.post(
 
 //read
 app.get(
-  '/v1/api/:accommodationId/reviews',
+  '/v1/api/:accommodationId/accommodation',
   (req, res) => {
-    dbReviewModel.getAllReviewsForSpecificHouse(
-      (reviews) => {
-        res.send(reviews)
+    //console.time('Speed of getAccommodation()');
+    dbReviewModel.getAccommodation(
+      (accommodation) => {
+        res.send(accommodation);
+        //console.timeEnd('Speed of getAccommodation()');
       },
       req.params.accommodationId
     );
